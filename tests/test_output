@@ -1,0 +1,5 @@
+#!/bin/bash
+
+expectaction=`echo {0..254} {0..254} {0..89} | fold -w 20`
+actual_result=`build/buf | xargs | fold -w 20`
+diff <(echo "$expectaction") <(echo "$actual_result")

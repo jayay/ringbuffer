@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "cstdbool": "cpp",
+        "ringbuffer.h": "c",
+        "*.tcc": "c",
+        "cstdlib": "c",
+        "memory": "c",
+        "new": "c"
+    }
+}
