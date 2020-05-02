@@ -1,14 +1,33 @@
 #!/bin/bash
 
-echo "--- Consistency test ---"
-
-expectaction=`echo {0..254} {0..254} {0..89} | fold -w 20`
-
-for i in {0..100}; do
-    actual_result=`timeout 1 build/buf | xargs | fold -w 20`
-    diff <(echo "$expectaction") <(echo "$actual_result")
+assert_eq() {
+    diff <(echo "$1") <(echo "$2") 1>&2
     if test $? -ne 0; then
-        echo "Error happened during iteration $i"
-        exit 1
+        echo "❌"
+        >&2 echo $3
+        exit 1;
     fi
-done
+    echo -n "✔️"
+}
+
+test_output() {
+    echo -en "\nOutput test\t\t"
+    expectaction=`echo {0..254} {0..254} {0..89} | fold -w 20`
+    actual_result=`timeout 1 build/buf | xargs | fold -w 20`
+    assert_eq "$expectaction" "$actual_result"
+}
+
+test_consistency() {
+    echo -en "\nConsistency test\t"
+    expectaction=`echo {0..254} {0..254} {0..89} | fold -w 20`
+
+    for i in {0..100}; do
+        actual_result=`timeout 1 build/buf | xargs | fold -w 20`
+        assert_eq "$expectaction" "$actual_result" "Error happened during iteration $i"
+    done
+}
+
+test_consistency
+test_output
+
+echo -e "\n"
