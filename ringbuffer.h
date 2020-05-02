@@ -18,8 +18,6 @@ typedef struct ring_buffer {
     sem_t sem_w;
     sem_t sem_r;
     _Atomic bool eof;
-    pthread_mutex_t producer_mutex;
-    pthread_mutex_t consumer_mutex;
     char buffer[BUFFER_SIZE];
 } ring_buffer;
 
