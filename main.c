@@ -33,7 +33,7 @@ int main(int argc, char** argv) {
     pthread_t producer, consumer;
 
     ring_buffer* rb;
-    if (ring_buffer_init(&rb) < 0) {
+    if (ring_buffer_init(&rb, 256) < 0) {
         BAIL("allocating ring buffer failed");
     }
 

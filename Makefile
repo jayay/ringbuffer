@@ -19,4 +19,4 @@ test: build/buf
 clean:
 	rm -rf build/*.o build/buf
 
-.PHONY: clean
+.PHONY: clean test run

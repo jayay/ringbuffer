@@ -6,23 +6,22 @@
 #include <pthread.h>
 #include <stdlib.h>
 
-#define BUFFER_SIZE 64
-
 #define BAIL(message) \
     fprintf(stderr, "Error: %s\n", (message));\
     exit(EXIT_FAILURE);
 
 typedef struct ring_buffer {
-     _Atomic size_t head;
-     _Atomic size_t tail;
+    size_t capacity;
+    _Atomic size_t head;
+    _Atomic size_t tail;
     sem_t sem_w;
     sem_t sem_r;
     _Atomic bool eof;
-    char buffer[BUFFER_SIZE];
+    char* buffer;
 } ring_buffer;
 
 
-int ring_buffer_init(ring_buffer** object);
+int ring_buffer_init(ring_buffer** object, const size_t capacity);
 
 size_t ring_buffer_write(ring_buffer* object, const char* data, const size_t len);
 

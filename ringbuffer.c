@@ -7,13 +7,13 @@
 static void ring_buffer_advance_head(ring_buffer* object, size_t bytes)
 {
     assert(object);
-    object->head = (object->head + bytes) % BUFFER_SIZE;
+    object->head = (object->head + bytes) % object->capacity;
 }
 
 static void ring_buffer_advance_tail(ring_buffer* object, size_t bytes)
 {
     assert(object);
-    object->tail = (object->tail + bytes) % BUFFER_SIZE;
+    object->tail = (object->tail + bytes) % object->capacity;
 }
 
 static inline void consumer_notify_producer(ring_buffer* object)
@@ -48,16 +48,22 @@ static inline void consumer_wait_if_idle(ring_buffer* object)
     }
 }
 
-int ring_buffer_init(ring_buffer** object)
+int ring_buffer_init(ring_buffer** object, const size_t capacity)
 {
     *object = malloc(sizeof(ring_buffer));
     if (*object == NULL) {
         return -1;
     }
+
+    (*object)->buffer = malloc(capacity);
+    if ((*object)->buffer == NULL) {
+        return -1;
+    }
     (*object)->head = ATOMIC_VAR_INIT(0);
     (*object)->tail = ATOMIC_VAR_INIT(0);
     (*object)->eof = ATOMIC_VAR_INIT(false);
-    if (sem_init(&(*object)->sem_w, 0, BUFFER_SIZE - 1) < 0
+    (*object)->capacity = capacity;
+    if (sem_init(&(*object)->sem_w, 0, capacity - 1) < 0
         || sem_init(&(*object)->sem_r, 0, 0)) {
         BAIL("sem_init failed");
     }
@@ -105,7 +111,9 @@ void ring_buffer_free(ring_buffer* object)
     if (object != NULL) {
         sem_destroy(&object->sem_w);
         sem_destroy(&object->sem_r);
+        free(object->buffer);
         free(object);
+
         object = NULL;
     }
 }
