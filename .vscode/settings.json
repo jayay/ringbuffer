@@ -5,6 +5,7 @@
         "*.tcc": "c",
         "cstdlib": "c",
         "memory": "c",
-        "new": "c"
+        "new": "c",
+        "cassert": "c"
     }
 }

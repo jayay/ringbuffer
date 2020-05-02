@@ -1,0 +1,14 @@
+#!/bin/bash
+
+echo "--- Consistency test ---"
+
+expectaction=`echo {0..254} {0..254} {0..89} | fold -w 20`
+
+for i in {0..100}; do
+    actual_result=`timeout 1 build/buf | xargs | fold -w 20`
+    diff <(echo "$expectaction") <(echo "$actual_result")
+    if test $? -ne 0; then
+        echo "Error happened during iteration $i"
+        exit 1
+    fi
+done
